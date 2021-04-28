@@ -1,0 +1,5 @@
+django
+psycopg2-binary
+clickhouse-driver
+python-decouple
+dj_database_url
