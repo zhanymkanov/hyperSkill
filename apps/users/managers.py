@@ -1,7 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
 
-from .constants import ErrorMessage
-
 
 class UserManager(BaseUserManager):
     """
