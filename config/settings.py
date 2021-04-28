@@ -1,5 +1,6 @@
 import os
 
+from celery.schedules import crontab
 from decouple import config
 from dj_database_url import parse as db_url
 
@@ -23,7 +24,10 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "django_celery_beat",
+    "django_celery_results",
+]
 
 LOCAL_APPS = [
     "apps.users",
@@ -108,3 +112,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 AUTH_USER_MODEL = "users.User"
 SITE_ID = 1
+
+CELERY_BROKER_URL = 'pyamqp://rabbitmq:5672'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULE = {
+    'ch_every_min': {
+        'task': 'apps.events.tasks.ch_every_min',
+        'schedule': crontab(),
+    },
+}

@@ -2,4 +2,7 @@ django
 psycopg2-binary
 clickhouse-driver
 python-decouple
-dj_database_url
+dj-database-url
+celery
+django_celery_beat
+django-celery-results

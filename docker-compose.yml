@@ -4,17 +4,24 @@ services:
   hyper:
     env_file:
       - .env
+    container_name: hyper
+    hostname: hyper
     build: .
     volumes:
       - ./:/proj
     ports:
       - 8000:8000
+    image: hyper-image
     depends_on:
       - db
+      - rabbitmq
     command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - main
 
   db:
     image: postgres:13
+    container_name: db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -23,6 +30,47 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+    networks:
+      - main
+
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+    restart: on-failure
+    networks:
+      - main
+
+  celery_worker:
+    command: sh -c "wait-for rabbitmq:5672 && wait-for hyper:8000 -- celery -A config worker -l info"
+    container_name: celery_worker
+    depends_on:
+      - hyper
+      - db
+      - rabbitmq
+    hostname: celery_worker
+    image: hyper-image
+    restart: on-failure
+    networks:
+      - main
+
+  celery_beat:
+    command: sh -c "wait-for rabbitmq:5672 && wait-for hyper:8000 -- celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    container_name: celery_beat
+    depends_on:
+      - hyper
+      - db
+      - rabbitmq
+    networks:
+      - main
+    hostname: celery_beat
+    image: hyper-image
+    restart: on-failure
 
 volumes:
   db_data:
+
+networks:
+  main:
