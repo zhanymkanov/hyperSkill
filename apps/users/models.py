@@ -14,8 +14,8 @@ class User(AbstractUser):
     name = models.TextField()
     email = models.EmailField(unique=True)
     is_guest = models.BooleanField(default=True)
-    join_date = models.DateTimeField(default=timezone.now)
-    registration_date = models.DateTimeField(null=True)
+    join_date = models.DateField(default=timezone.now)
+    registration_date = models.DateField(null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
