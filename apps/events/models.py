@@ -6,12 +6,12 @@ from apps.users.models import User
 
 
 class Events(models.Model):
-    class Actions(models.TextChoices):
-        SEE = 0, "SEEN"
-        SUBMIT = 1, "SUBMITTED"
-        SOLVE = 2, "SOLVED"
+    class Actions(models.IntegerChoices):
+        SEE = 0
+        SUBMIT = 1
+        SOLVE = 2
 
     time = models.DateTimeField(default=timezone.now)
-    action_id = models.TextField(choices=Actions.choices)
+    action_id = models.IntegerField(choices=Actions.choices)
     target = models.ForeignKey(Steps, null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
