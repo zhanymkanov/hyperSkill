@@ -13,5 +13,5 @@ class Events(models.Model):
 
     time = models.DateTimeField(default=timezone.now)
     action_id = models.TextField(choices=Actions.choices)
-    target_id = models.ForeignKey(Steps, null=True, on_delete=models.SET_NULL)
+    target = models.ForeignKey(Steps, null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
