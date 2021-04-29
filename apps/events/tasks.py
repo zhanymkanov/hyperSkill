@@ -18,7 +18,7 @@ STEPIK_FOUNDED_DATETIME = datetime.datetime(2013, 9, 1, tzinfo=pytz.UTC)
 
 @celery_app.task
 def ch_every_min():
-    last_parsed = STEPIK_FOUNDED_DATETIME
+    last_parsed = STEPIK_FOUNDED_DATETIME  # suppose we dynamically get this from db
     logger.info(f"Started data collection starting from {last_parsed}")
 
     events: QuerySet = Events.objects.select_related("user")
@@ -38,4 +38,3 @@ def ch_every_min():
     clickhouse = Clickhouse()
     clickhouse.insert_data(val for val in insert_values)
     logger.info(f"Successfully loaded data to CH")
-
