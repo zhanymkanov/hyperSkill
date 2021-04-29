@@ -2,15 +2,25 @@ from typing import List, Generator
 
 from clickhouse_driver import Client
 
+DEFAULT_DB_NAME = "analytics"
 DEFAULT_TABLE_NAME = "analytics.facts_events"
 
 
 class Clickhouse:
-    def __init__(self, table_name=DEFAULT_TABLE_NAME):
+    def __init__(self, db_name=DEFAULT_DB_NAME, table_name=DEFAULT_TABLE_NAME):
         self.client = Client(host="clickhouse")
+        self.db_name = db_name
         self.table_name = table_name
 
+        self._init_db()
         self._init_tables()
+
+    def _init_db(self):
+        create_query = f"""
+        CREATE DATABASE IF NOT EXISTS {self.db_name};
+        """
+
+        self.client.execute(create_query)
 
     def _init_tables(self):
         create_query = f"""
