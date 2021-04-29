@@ -14,3 +14,7 @@ docker-compose up -d
 ```
 docker-compose exec hyper python manage.py migrate
 ```
+### Database Population
+```
+docker-compose exec hyper python -m scripts.populate
+```
