@@ -20,7 +20,7 @@ STEPIK_FOUNDED_DATETIME = datetime.datetime(2013, 9, 1, tzinfo=pytz.UTC)
 def load_to_ch():
     """Load consolidated events data from postgres to clickhouse every 5 minutes."""
 
-    last_parsed = STEPIK_FOUNDED_DATETIME  # suppose we dynamically get this from db
+    last_parsed = get_last_parsed_date()
     logger.info(f"Started data collection starting from {last_parsed}")
 
     events: QuerySet = Events.objects.select_related("user")  # join tables
@@ -40,3 +40,8 @@ def load_to_ch():
     clickhouse = Clickhouse()
     clickhouse.insert_data(val for val in insert_values)
     logger.info(f"Successfully loaded data to CH")
+
+
+def get_last_parsed_date():
+    # some DB operations to get last parsed timestamp
+    return STEPIK_FOUNDED_DATETIME
