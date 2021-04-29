@@ -116,8 +116,8 @@ SITE_ID = 1
 CELERY_BROKER_URL = 'pyamqp://rabbitmq:5672'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULE = {
-    'ch_every_min': {
-        'task': 'apps.events.tasks.ch_every_min',
-        'schedule': crontab(),
+    'load_to_ch': {
+        'task': 'apps.events.tasks.load_to_ch',
+        'schedule': crontab(minute='*/5'),
     },
 }

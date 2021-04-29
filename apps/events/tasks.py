@@ -17,7 +17,7 @@ STEPIK_FOUNDED_DATETIME = datetime.datetime(2013, 9, 1, tzinfo=pytz.UTC)
 
 
 @celery_app.task
-def ch_every_min():
+def load_to_ch():
     last_parsed = STEPIK_FOUNDED_DATETIME  # suppose we dynamically get this from db
     logger.info(f"Started data collection starting from {last_parsed}")
 
