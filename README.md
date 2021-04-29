@@ -22,3 +22,11 @@ docker-compose exec hyper python manage.py migrate
 ```
 docker-compose exec hyper python -m scripts.populate
 ```
+
+### Clickhouse Playground
+1. Run clickhouse-client
+```
+docker-compose exec clickhouse-client clickhouse-client --host clickhouse
+```
+2. Copy-paste SQL from sql/date_action_users.sql
+3. Try any other queries 
