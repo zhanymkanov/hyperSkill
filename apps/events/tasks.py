@@ -33,7 +33,7 @@ def ch_every_min():
         "target_id",
         "action_id",
     )
-    logger.info(f"Values to insert: {len(insert_values)}")
+    logger.info(f"Values to insert: {insert_values.count()}")
 
     clickhouse = Clickhouse()
     clickhouse.insert_data(val for val in insert_values)
