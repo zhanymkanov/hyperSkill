@@ -88,6 +88,14 @@ services:
     volumes:
       - ./data/clickhouse
 
+  clickhouse-client:
+    image: yandex/clickhouse-client
+    networks:
+      - main
+    entrypoint:
+      - /bin/sleep
+    command: infinity
+
 volumes:
   db_data:
 
