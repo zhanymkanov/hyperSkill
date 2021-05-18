@@ -2,7 +2,9 @@ import datetime
 import logging
 
 import pytz
+from clickhouse_driver.errors import ServerException
 from config.celery import app as celery_app
+from celery.utils.log import get_task_logger
 
 from django.db.models import QuerySet
 
@@ -10,7 +12,7 @@ from apps.clickhouse import Clickhouse
 from apps.events.models import Events
 
 
-logger = logging.getLogger("ch_worker")
+logger = get_task_logger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 STEPIK_FOUNDED_DATETIME = datetime.datetime(2013, 9, 1, tzinfo=pytz.UTC)
@@ -26,7 +28,10 @@ STEPIK_FOUNDED_DATETIME = datetime.datetime(2013, 9, 1, tzinfo=pytz.UTC)
 def load_to_ch():
     """Load consolidated events data from postgres to clickhouse every 5 minutes."""
 
-    last_parsed = get_last_parsed_date()
+    clickhouse = Clickhouse()
+    last_parsed: datetime.datetime = clickhouse.get_latest_event_time()[0][0]
+    last_parsed: str = last_parsed.strftime("%Y-%m-%d %H:%M:%S.%f")
+
     logger.info(f"Started data collection starting from {last_parsed}")
 
     events: QuerySet = Events.objects.select_related("user")  # join tables
@@ -40,14 +45,7 @@ def load_to_ch():
         "user__is_guest",
         "target_id",
         "action_id",
-    )
-    logger.info(f"Values to insert: {insert_values.count()}")
-
-    clickhouse = Clickhouse()
+    ).iterator(chunk_size=100_000)
     clickhouse.insert_data(val for val in insert_values)
+
     logger.info(f"Successfully loaded data to CH")
-
-
-def get_last_parsed_date():
-    # some DB operations to get last parsed timestamp
-    return STEPIK_FOUNDED_DATETIME

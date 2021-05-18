@@ -60,3 +60,10 @@ class Clickhouse:
         VALUES 
         """
         self.client.execute(insert_query, records)
+
+    def get_latest_event_time(self):
+        select_query = f"""
+        SELECT max(time) 
+        FROM {self.table_name}
+        """
+        return self.client.execute(select_query) or "0000-00-00"
