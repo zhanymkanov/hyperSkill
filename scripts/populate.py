@@ -7,7 +7,10 @@ django.setup()  # noqa
 
 import random
 import logging
+from time import sleep
 from typing import List
+
+from django.utils import timezone
 
 from apps.events.models import Events
 from apps.steps.models import Steps
@@ -33,7 +36,9 @@ def populate_users(num_users: int = 10000) -> List[User]:
     return User.objects.bulk_create(bulk_users)
 
 
-def populate_events(*, users: List[User] = None, steps: List[Steps] = None):
+def populate_events(
+    *, users: List[User] = None, steps: List[Steps] = None, now: bool = False
+):
     users = users or User.objects.all()
     steps = steps or Steps.objects.all()
 
@@ -41,12 +46,12 @@ def populate_events(*, users: List[User] = None, steps: List[Steps] = None):
     num_submit = num_see // 2
     num_solve = num_submit // 2
 
-    see_events = _create_events_list(steps, users, action=Events.Actions.SEE)
+    see_events = _create_events_list(steps, users, action=Events.Actions.SEE, now=now)
     submit_events = _create_events_list(
-        steps, users[:num_submit], action=Events.Actions.SUBMIT
+        steps, users[:num_submit], action=Events.Actions.SUBMIT, now=now
     )
     solve_events = _create_events_list(
-        steps, users[:num_solve], action=Events.Actions.SOLVE
+        steps, users[:num_solve], action=Events.Actions.SOLVE, now=now
     )
 
     Events.objects.bulk_create(
@@ -70,11 +75,11 @@ def _create_random_user():
     return user
 
 
-def _create_events_list(steps, users, *, action):
+def _create_events_list(steps, users, *, action, now):
     return [
         Events(
             user=user,
-            time=utils.random_datetime(),
+            time=timezone.now() if now else utils.random_datetime(),
             action_id=action,
             target=random.choice(steps)
         ) for user in users
@@ -89,3 +94,13 @@ if __name__ == '__main__':
     logger.info("Populated users data")
     populate_events(users=users, steps=steps)
     logger.info("Populated events data")
+
+    while 1:
+        logger.info("Started the population script")
+        steps = populate_steps()
+        logger.info("Populated steps data")
+        users = populate_users()
+        logger.info("Populated users data")
+        populate_events(users=users, steps=steps, now=True)
+        logger.info("Populated events data")
+        sleep(2)
