@@ -16,7 +16,13 @@ logging.basicConfig(level=logging.DEBUG)
 STEPIK_FOUNDED_DATETIME = datetime.datetime(2013, 9, 1, tzinfo=pytz.UTC)
 
 
-@celery_app.task
+@celery_app.task(
+    autoretry_for=(ServerException,),
+    max_retries=10,
+    retry_backoff=True,
+    retry_backoff_max=700,
+    retry_jitter=False
+)
 def load_to_ch():
     """Load consolidated events data from postgres to clickhouse every 5 minutes."""
 
