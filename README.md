@@ -19,9 +19,7 @@ docker-compose up -d
 docker-compose exec hyper python manage.py migrate
 ```
 ### Database Population
-```
-docker-compose exec hyper python -m scripts.populate
-```
+Script automatically populate DB every 2-5 seconds, so you can comment out `hyper_populate` service if it is not required
 
 ### Clickhouse Playground
 1. Run clickhouse-client
